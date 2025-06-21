@@ -1,0 +1,143 @@
+﻿@model IEnumerable<TaskDto>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1 class="justify-content-center">Make your Future Better </h1>
+<!-- From Uiverse.io by mi-series -->
+<link href="~/css/stylesheet.css" rel="stylesheet" />
+<div>
+    <a class="btn" asp-controller="Task" asp-action="Create">
+        <i class="animation"></i>Add Task<i class="animation"></i>
+    </a>
+</div>
+@if (Model.Any()&& Model != null )
+{
+
+    <table class="table table-hover mt-2">
+        <thead>
+            <tr >
+                <th>Title</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Details</th>
+                
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(item.Status.ToString() =="Completed"? "text-decoration-line-through text-muted" : "")">
+                    <td>
+                        <div class="form-check d-flex align-items-center gap-2">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#completeModal-@item.Id"
+                            @(item.Status.ToString() == "Completed" ? "checked disabled" : "") />
+
+                            <span class="fs-5">📝</span>
+                            <label class="form-check-label">@item.Title</label>
+                        </div>
+
+                        <!-- Modal for marking as complete -->
+                        <div class="modal fade" id="completeModal-@item.Id" tabindex="-1" aria-labelledby="modalLabel-@item.Id" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalLabel-@item.Id">Mark as Completed</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to mark the task <strong>@item.Title</strong> as completed?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button"
+                                                class="btn btn-success mark-complete-btn"
+                                                data-id="@item.Id"
+                                                data-bs-dismiss="modal">
+                                            Yes, Mark as Completed
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="badge @(item.Status.ToString() == "Pending" ? "bg-warning text-dark" :
+                                 item.Status.ToString() == "InProgress" ? "bg-primary" :
+                                 "bg-success")">@item.Status</span>
+                    </td>
+                    <td>
+                        <span class="badge @(item.Priority.ToString() == "Low" ? "bg-success" :
+                                           item.Priority.ToString() == "Medium" ? "bg-warning text-dark" :
+                                           "bg-danger")"
+                                           >@item.Priority</span>
+                    </td>
+               
+                    <td><a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary"><i class="fas fa-eye"></i>Details</a></td>
+                            <!--Delete Part-->
+                            <td>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.Id">
+                                    <i class="fas fa-trash"></i> Delete
+                            </button>
+                                 <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteModal-@item.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Delete Task</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are You Sure to Delete this Task?
+                                            </div>
+                                            <div class="modal-footer">
+                                                  <form method="post" asp-action="Delete" asp-controller="Task" asp-route-id="@item.Id" class="mt-4">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <input type="submit" value="Delete" class="btn btn-danger" />
+                                                </form>
+                                            </div>
+                                        </div>
+                                  </div>
+                            </div>
+                        </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class=" alert alert-info  mt-5">No Tasks Yet.</div>
+}
+
+<!--For Real Time Update-->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.querySelectorAll(".mark-complete-btn").forEach(btn => {
+            btn.addEventListener("click", async function () {
+                const taskId = this.dataset.id;
+
+                try {
+                    const response = await fetch(`/Task/MarkAsComplete/${taskId}`, {
+                        method: 'POST'
+                    });
+
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert("❌ Error updating task.");
+                    }
+                } catch (err) {
+                    alert("⚠️ Network error.");
+                }
+            });
+        });
+    </script>
+}

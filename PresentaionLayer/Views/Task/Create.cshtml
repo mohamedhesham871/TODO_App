@@ -1,0 +1,53 @@
+﻿@model TaskDetailsOrCreateDto
+@{
+    ViewData["Title"] = "Create";
+}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<div class="container mt-5">
+    <div class="card shadow p-4" style="max-width: 700px; margin: auto;">
+        <h2 class="mb-4">📝 Create New Task</h2>
+        <form asp-action="Create" method="post">
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Status" class="form-label"></label>
+                <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<LogicLayer.Enums.Status>()">
+                    <option value="">-- Select Status --</option>
+                </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Priority" class="form-label"></label>
+                <select asp-for="Priority" class="form-select" asp-items="Html.GetEnumSelectList<LogicLayer.Enums.Priority>()">
+                    <option value="">-- Select Priority --</option>
+                </select>
+                <span asp-validation-for="Priority" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DueDate" class="form-label"></label>
+                <input asp-for="DueDate" class="form-control" type="date" />
+                <span asp-validation-for="DueDate" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">✅ Create Task</button>
+            <a href="/Task/Index" class="btn btn-secondary ms-2">Back</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,46 @@
+﻿@model TaskDto
+@{
+    ViewData["Title"] = "Details";
+}
+
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container mt-5">
+    <div class="card p-4 shadow-sm" style="max-width: 600px; margin: auto; border-radius: 15px;">
+        <h3 class="card-title">📝 Task: @Model.Title</h3>
+        <p class="card-text">
+            <strong>Description:</strong> @Model.Description
+        </p>
+        <p class="card-text">
+            <strong>Status:</strong>
+            @if(Model.Status.ToString() == "Completed")
+            {
+                <span class="badge bg-success text-dark">@Model.Status</span>
+            }
+            else if (Model.Status.ToString() == "Pending")
+            {
+                <span class="badge bg-warning text-dark">@Model.Status</span>
+            }
+            else
+            {
+                <span class="badge bg-primary text-dark">@Model.Status</span>
+            }
+        </p>
+        <p class="card-text">
+            <strong>Priority:</strong>
+            <span class="badge
+            @(Model.Priority.ToString() == "Low" ? "bg-success" :
+              Model.Priority.ToString() == "Medium" ? "bg-warning text-dark" :
+              Model.Priority.ToString() == "High" ? "bg-danger" : "bg-secondary")">
+                @Model.Priority
+            </span>
+        </p>
+        <p class="card-text">
+            <strong>Due Date:</strong> @Model.DueDate.ToString();
+        </p>
+        <a><a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-success"><i class="fas fa-edit"></i>Edit</a></a>
+        <a href="/Task/Index" class="btn btn-secondary mt-3">⬅ Back to Tasks</a>
+    </div>
+</div>
