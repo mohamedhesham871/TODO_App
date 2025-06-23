@@ -12,46 +12,48 @@ namespace LogicLayer
 
         public async Task<TaskDetailsOrCreateDto> AddTaskAsync(TaskDetailsOrCreateDto task)
         {
-            if(task == null)
+            
+            if (task == null)
             {
                 throw new ArgumentNullException(nameof(task), "Task cannot be null"); // Fix Error Later
             }
             //convert from TaskDetailsOrCreateDto to TaskTable
-            var taskTable = new DataAccessLayer.Models.TaskTable
+           
+            var taskTable = new TaskTable
             {
                 Title = task.Title,
                 Description = task.Description,
                 Status = task.Status.ToString(),
                 Priority = task.Priority.ToString(),
                 DueDate = task.DueDate,
-                CreatedDate = DateTime.UtcNow,
-                LastModifiedDate = DateTime.UtcNow
+                CreatedDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now
             };
             await _repository.AddTaskAsync(taskTable);
             //return the created task as TaskDetailsOrCreateDto
             return (task);
         }
 
-        public  async Task<bool> DeleteTaskAsync(int id)
+        public async Task<bool> DeleteTaskAsync(int id)
         {
-           if(id <= 0)
+            if (id <= 0)
             {
                 throw new ArgumentException("Invalid task ID", nameof(id));
             }
             // Ensure the task exists before attempting to delete
-            var task =  _repository.GetTaskByIdAsync(id);
+            var task = _repository.GetTaskByIdAsync(id);
             if (task == null)
             {
                 throw new KeyNotFoundException($"Task with ID {id} not found.");
             }
             // Proceed with deletion
-           var res= await _repository.DeleteTaskAsync(task.Result);
+            var res = await _repository.DeleteTaskAsync(task.Result);
             return res;
         }
 
         public async Task<List<TaskDto>> GetAllTasksAsync()
         {
-            var  tasks =await _repository.GetAllTasksAsync();
+            var tasks = await _repository.GetAllTasksAsync();
             //convert from TaskTable to TaskDetailsOrCreateDto
             return tasks.Select(task => new TaskDto
             {
@@ -73,7 +75,7 @@ namespace LogicLayer
                 throw new ArgumentException("Invalid task ID", nameof(id));
             }
             var result = await _repository.GetTaskByIdAsync(id);
-            if(result == null)
+            if (result == null)
             {
                 throw new KeyNotFoundException($"Task with ID {id} not found.");
             }
@@ -112,12 +114,31 @@ namespace LogicLayer
                 LastModifiedDate = DateTime.Now // Automatically set to current time
             };
             var updatedTask = await _repository.UpdateTaskAsync(taskTable);
-           // Ensure changes are saved to the database
-            if (updatedTask is  null)
+            // Ensure changes are saved to the database
+            if (updatedTask is null)
             {
                 throw new Exception("Failed to update task");
             }
             return task;
+        }
+
+        public async Task<List<TaskDto>> GetFilteredStatusAsync(List<string> statuses)
+        {
+            if (statuses == null || !statuses.Any())
+            {
+                throw new ArgumentException("Statuses cannot be null or empty", nameof(statuses));
+            }
+            var tasks = await _repository.GetFilteredStatusAsync(statuses);
+            //convert from TaskTable to TaskDetailsOrCreateDto
+            return tasks.Select(task => new TaskDto
+            {
+                Id = task.Id,
+                Title = task.Title,
+                Description = task.Description,
+                Status = Enum.Parse<Status>(task.Status),
+                Priority = Enum.Parse<Priority>(task.Priority),
+                DueDate = task.DueDate
+            }).ToList();
         }
     }
 }

@@ -63,5 +63,17 @@ namespace DataAccessLayer.Repository
             return existing;
         }
 
+        // Get Filter 
+        public async Task<List<TaskTable>> GetFilteredStatusAsync(List<string> statuses)
+        {
+            
+
+            var query = await _context.TaskTables
+                                      .Where(t => statuses.Contains(t.Status))
+                                      .ToListAsync();
+            return query;
+        }
+
+
     }
 }

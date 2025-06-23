@@ -15,5 +15,6 @@ namespace LogicLayer
         Task<TaskDetailsOrCreateDto> AddTaskAsync(TaskDetailsOrCreateDto task);
         Task<TaskDetailsOrCreateDto>  UpdateTaskAsync(TaskDetailsOrCreateDto task,int id);
         Task<bool> DeleteTaskAsync(int id);
+        public  Task<List<TaskDto>> GetFilteredStatusAsync(List<string> statuses);
     }
 }
