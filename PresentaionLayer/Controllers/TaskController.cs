@@ -69,7 +69,9 @@ namespace PresentaionLayer.Controllers
             {
                 try
                 {
+                   
                     var createdtask = await services.AddTaskAsync(task);
+
                     if (createdtask is not null) return RedirectToAction("Index");
                     else
                     {
@@ -100,7 +102,7 @@ namespace PresentaionLayer.Controllers
             {
                 Title = task.Title,
                 Description = task.Description,
-                Status =task.Status,
+                Status = task.Status,
                 Priority = task.Priority,
                 DueDate = task.DueDate
             };
@@ -113,7 +115,7 @@ namespace PresentaionLayer.Controllers
             {
                 try
                 {
-                   await services.UpdateTaskAsync(task, id);
+                    await services.UpdateTaskAsync(task, id);
                     return RedirectToAction("Index");
                 }
                 catch (Exception ex)
@@ -135,7 +137,7 @@ namespace PresentaionLayer.Controllers
         [HttpPost]
         public async Task<IActionResult> MarkAsComplete(int id)
         {
-            if(id <= 0) return BadRequest();
+            if (id <= 0) return BadRequest();
 
             var task = await services.GetTaskByIdAsync(id);
             if (task == null) return NotFound();
@@ -151,6 +153,36 @@ namespace PresentaionLayer.Controllers
             await Edit(taskDto, id);
             return Ok();
         }
-         
+        [HttpPost]
+        public async Task<IActionResult> FilterByStatus(List<string> statuses)
+        {
+            if (statuses == null || !statuses.Any())
+            {
+                ModelState.AddModelError("", "Please select at least one status to filter.");
+                return View("Index", await services.GetAllTasksAsync());
+            }
+            try
+            {
+                var filteredTasks = await services.GetFilteredStatusAsync(statuses);
+                if (filteredTasks == null || !filteredTasks.Any())
+                {
+                    ModelState.AddModelError("", "No tasks found for the selected status(es).");
+                    return View("Index", await services.GetAllTasksAsync());
+                }
+                return View("Index", filteredTasks);
+            }
+            catch (Exception ex)
+            {
+                if (_environment.IsDevelopment())
+                {
+                    ModelState.AddModelError("", ex.Message);
+                }
+                else
+                {
+                    _logger.LogError(ex.Message);
+                }
+            }
+            return View("Index", await services.GetAllTasksAsync());
+        }
     }
 }

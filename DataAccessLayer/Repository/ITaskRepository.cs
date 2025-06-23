@@ -14,5 +14,6 @@ namespace DataAccessLayer.Repository
         public Task<TaskTable> AddTaskAsync(TaskTable task);
         public Task<TaskTable> UpdateTaskAsync(TaskTable task);
         public Task<bool> DeleteTaskAsync(TaskTable task);
+        public Task<List<TaskTable>> GetFilteredStatusAsync(List<string> statuses);
     }
 }

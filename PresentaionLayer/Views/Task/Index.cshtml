@@ -14,6 +14,21 @@
 @if (Model.Any()&& Model != null )
 {
 
+    <!-- Wrap the form in a div aligned to the right -->
+    <div class="d-flex justify-content-end">
+        <form asp-action="FilterByStatus" method="post" class="text-end">
+            @foreach (var status in new[] { "Pending", "InProgress", "Completed" })
+            {
+                <div class="form-check mb-1">
+                    <input class="form-check-input" type="checkbox" name="statuses" value="@status" id="@status">
+                    <label class="form-check-label" for="@status">@status</label>
+                </div>
+            }
+
+            <button type="submit" class="btn btn-primary mt-2">Filter</button>
+        </form>
+    </div>
+
     <table class="table table-hover mt-2">
         <thead>
             <tr >
@@ -107,6 +122,7 @@
                         </td>
                 </tr>
             }
+
         </tbody>
     </table>
 }
@@ -114,6 +130,7 @@ else
 {
     <div class=" alert alert-info  mt-5">No Tasks Yet.</div>
 }
+
 
 <!--For Real Time Update-->
 @section Scripts {
